@@ -251,6 +251,57 @@ a { color: var(--accent); text-decoration: none; }
 .team-linkedin:hover { background: rgba(10,102,194,0.15); }
 .team-linkedin svg { width: 14px; height: 14px; fill: #0a66c2; }
 
+/* HUMAN STORY */
+.story-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin: 2rem 0; position: relative; overflow: hidden; }
+.story-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--auditor), var(--core), var(--safe)); }
+.story-split { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 1rem; align-items: start; }
+.story-side { padding: 1rem; }
+.story-side h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+.story-side .scenario { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.story-side .scenario strong { color: var(--text); }
+.story-side .scenario .miss { color: var(--danger); font-weight: 700; }
+.story-side .scenario .save { color: var(--safe); font-weight: 700; }
+.story-divider { display: flex; align-items: center; justify-content: center; }
+.story-divider span { writing-mode: vertical-rl; font-size: 0.7rem; font-weight: 800; color: var(--text-muted); letter-spacing: 0.15em; }
+.story-outcome { margin-top: 1.5rem; padding: 1rem 1.5rem; border-radius: 10px; font-size: 0.85rem; font-weight: 600; line-height: 1.6; text-align: center; }
+.story-outcome.bad { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); color: var(--danger); }
+.story-outcome.good { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); color: var(--safe); }
+
+/* FUTURE WORK */
+.future-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 2rem 0; }
+.future-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem; transition: transform 0.3s, border-color 0.3s; position: relative; overflow: hidden; }
+.future-card:hover { transform: translateY(-3px); }
+.future-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.future-card.phase::before { background: var(--probe); }
+.future-card.research::before { background: var(--field); }
+.future-card.vision::before { background: var(--core); }
+.future-card:hover.phase { border-color: rgba(167,139,250,0.3); }
+.future-card:hover.research { border-color: rgba(46,196,160,0.3); }
+.future-card:hover.vision { border-color: rgba(240,160,48,0.3); }
+.future-card h4 { font-size: 0.9rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.future-card .phase-tag { font-size: 0.55rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.phase-tag.next { background: rgba(167,139,250,0.12); color: var(--probe); }
+.phase-tag.planned { background: rgba(46,196,160,0.12); color: var(--field); }
+.phase-tag.long { background: rgba(240,160,48,0.12); color: var(--core); }
+.future-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }
+
+/* CTA */
+.cta-box { background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(46,196,160,0.06)); border: 2px solid rgba(167,139,250,0.15); border-radius: 16px; padding: 2.5rem; text-align: center; margin: 3rem 0 1rem; }
+.cta-box h3 { font-size: 1.3rem; font-weight: 900; margin-bottom: 0.8rem; }
+.cta-box p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; max-width: 650px; margin: 0 auto; }
+.cta-links { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+.cta-link { padding: 0.6rem 1.5rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: all 0.2s; }
+.cta-link.primary { background: linear-gradient(135deg, var(--probe), var(--field)); color: white; }
+.cta-link.primary:hover { box-shadow: 0 4px 20px rgba(167,139,250,0.3); transform: translateY(-2px); }
+.cta-link.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.cta-link.secondary:hover { border-color: var(--accent); }
+
+/* LIMITATIONS */
+.limits-row { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
+.limit-card { flex: 1; min-width: 250px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--core); border-radius: 0 10px 10px 0; padding: 1rem 1.2rem; }
+.limit-card h4 { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--core); }
+.limit-card p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; }
+
 /* FOOTER */
 .footer { padding: 3rem 2rem; text-align: center; border-top: 1px solid var(--border); }
 .footer p { font-size: 0.7rem; color: var(--text-muted); }
@@ -272,6 +323,8 @@ a { color: var(--accent); text-decoration: none; }
   .section { padding: 4rem 1rem 3rem; }
   .court-row { grid-template-columns: 1fr; }
   .nav-links { gap: 0.6rem; }
+  .story-split { grid-template-columns: 1fr; }
+  .story-divider { display: none; }
 }
 </style>
 </head>
@@ -286,6 +339,7 @@ a { color: var(--accent); text-decoration: none; }
     <a href="#pipeline">Pipeline</a>
     <a href="#simulation">Simulation</a>
     <a href="#results">Results</a>
+    <a href="#future">Future</a>
     <a href="#glossary">Glossary</a>
     <a href="#transparency">Numbers</a>
     <a href="#references">Refs</a>
@@ -337,6 +391,23 @@ a { color: var(--accent); text-decoration: none; }
       <div class="fitz-legend">
         <div class="fitz-legend-item"><div class="legend-dot" style="background:var(--baseline)"></div>Standard AI (Single doctor, no review)</div>
         <div class="fitz-legend-item"><div class="legend-dot" style="background:var(--field)"></div>PANDERMA (Full courtroom)</div>
+      </div>
+    </div>
+
+    <div class="story-box fade-up">
+      <h3 style="font-size:0.65rem;font-weight:800;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;margin-bottom:1.2rem;text-align:center">Same Patient. Two Systems. Two Outcomes.</h3>
+      <div class="story-split">
+        <div class="story-side">
+          <h4><span style="color:var(--danger)">&#x2718;</span> Without PANDERMA</h4>
+          <div class="scenario">A 34-year-old woman, <strong>Fitzpatrick VI</strong>, presents with a dark lesion on her palm. The standard AI runs one pass — sees a dark patch on dark skin. Confidence: <strong>48%</strong>. Output: <span class="miss">"Likely benign dermatosis."</span> No second opinion. No skin-tone context. No uncertainty flag. She goes home reassured.<br><br>Six months later, it's <span class="miss">Stage III acral melanoma.</span></div>
+          <div class="story-outcome bad">The AI never learned that melanoma on dark skin favors acral sites. It wasn't wrong — it was never taught.</div>
+        </div>
+        <div class="story-divider"><span>VS</span></div>
+        <div class="story-side">
+          <h4><span style="color:var(--safe)">&#x2714;</span> With PANDERMA</h4>
+          <div class="scenario">Same patient. Same image. The <strong>Probe Agent</strong> runs 30 passes — answers keep changing. Entropy: high. <strong>"I'm not confident."</strong> The <strong>Field Agent</strong> is called: <em>"On Fitzpatrick VI, melanoma favors acral sites. This palmar lesion requires closer evaluation."</em> The <strong>Core Agent</strong> detects cancer in the differential — threshold drops to <strong>0.35</strong>. The <strong>Auditor</strong> logs a bias gap.<br><br>Verdict: <span class="save">DEFER TO CLINICIAN.</span></div>
+          <div class="story-outcome good">PANDERMA doesn't diagnose cancer. It makes sure cancer isn't missed. The patient gets the biopsy she needs.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -642,6 +713,65 @@ tau_malignant = <span class="num">0.35</span>  <span class="cmt"># cancer suspec
   </div>
 </section>
 
+<!-- ===== LIMITATIONS ===== -->
+<section class="section auto-h" id="limitations" style="padding-top:5rem;">
+  <div class="section-inner">
+    <span class="section-label fade-up">Honest About Limits</span>
+    <h2 class="section-title fade-up">What we <span class="c4">haven't</span> solved yet.</h2>
+    <p class="section-sub fade-up">Strong research knows its own boundaries. Here are ours — and why they matter.</p>
+    <div class="limits-row">
+      <div class="limit-card fade-up">
+        <h4>Dataset Vintage</h4>
+        <p>Fitzpatrick17k images were collected before 2021. Dermatological imaging standards evolve — our model hasn't seen newer capture devices, lighting conditions, or demographic shifts. A custom, prospectively collected dataset is our top priority.</p>
+      </div>
+      <div class="limit-card fade-up stagger-1">
+        <h4>LLM Prompt Sensitivity</h4>
+        <p>The Field Agent (LLM) is sensitive to how we phrase clinical prompts. Small wording changes can shift its reasoning. We're developing standardized, validated prompt templates through structured clinical review.</p>
+      </div>
+      <div class="limit-card fade-up stagger-2">
+        <h4>Pending Full Empirical Validation</h4>
+        <p>Baseline models (ResNet-50, ViT-B/16) are empirically validated. The full PANDERMA multi-agent pipeline numbers are projected from architecture design and baseline trajectories. End-to-end empirical validation is our next milestone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FUTURE WORK ===== -->
+<section class="section auto-h" id="future" style="padding-top:5rem;background:radial-gradient(ellipse at 50% 40%, rgba(167,139,250,0.04) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">What's Next</span>
+    <h2 class="section-title fade-up">The roadmap from <span class="c2">prototype</span> to <span class="safe">clinical tool.</span></h2>
+    <p class="section-sub fade-up">PANDERMA is not a finished product — it's a validated architecture with a clear path to deployment. Here's where we're going.</p>
+
+    <div class="future-grid">
+      <div class="future-card phase fade-up">
+        <h4><span class="phase-tag next">Next</span> Custom Dataset</h4>
+        <p>Build a prospectively collected, IRB-approved dataset with verified Fitzpatrick labels, diverse imaging conditions, and longitudinal tracking. Moving beyond Fitzpatrick17k's limitations — our data, our standards.</p>
+      </div>
+      <div class="future-card phase fade-up stagger-1">
+        <h4><span class="phase-tag next">Next</span> End-to-End MVP</h4>
+        <p>Complete PANDERMA pipeline as a working system: image upload, real-time multi-agent analysis, clinical dashboard showing each agent's reasoning, bias metrics, and deferral recommendations. The courtroom — live.</p>
+      </div>
+      <div class="future-card research fade-up stagger-2">
+        <h4><span class="phase-tag planned">Planned</span> GradCAM Explainability</h4>
+        <p>Visualize exactly where each agent is looking on the image. Clinicians don't trust black boxes — GradCAM heatmaps show why the Probe Agent flagged a region, making the AI's reasoning transparent and auditable.</p>
+      </div>
+      <div class="future-card research fade-up stagger-3">
+        <h4><span class="phase-tag planned">Planned</span> Intersectional Analysis</h4>
+        <p>Skin tone alone doesn't capture everything. Analyze bias across skin tone + age + gender + anatomical site simultaneously. A 65-year-old dark-skinned male with a plantar lesion faces compound risk — the system should know that.</p>
+      </div>
+      <div class="future-card vision fade-up">
+        <h4><span class="phase-tag long">Long-term</span> Federated Learning</h4>
+        <p>Train across hospitals without sharing patient images. Each institution keeps its data private — only model updates are shared. Addresses the core tension between AI performance and patient privacy.</p>
+      </div>
+      <div class="future-card vision fade-up stagger-1">
+        <h4><span class="phase-tag long">Long-term</span> Clinical Pilot</h4>
+        <p>Partner with a dermatology clinic for real-world validation. Measure whether PANDERMA's deferral recommendations actually change clinical outcomes — not just accuracy on a test set, but lives in a waiting room.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== GLOSSARY ===== -->
 <section class="section auto-h" id="glossary" style="padding-top:5rem;background:radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.03) 0%, transparent 60%);">
   <div class="section-inner">
@@ -657,7 +787,7 @@ tau_malignant = <span class="num">0.35</span>  <span class="cmt"># cancer suspec
   <div class="section-inner">
     <span class="section-label fade-up">Know Your Numbers</span>
     <h2 class="section-title fade-up">Empirical vs <span class="c4">Projected</span> — Full Transparency</h2>
-    <p class="section-sub fade-up">Academic honesty matters. Here is exactly what we have validated empirically and what is projected. Judges notice when you know the difference.</p>
+    <p class="section-sub fade-up">Academic honesty matters. Here is exactly what we have validated empirically and what is projected.</p>
     <div style="overflow-x:auto">
     <table class="transp-table fade-up">
       <thead><tr><th>#</th><th>Metric</th><th><span class="status-dot empirical"></span>Empirical</th><th><span class="status-dot projected"></span>Projected</th><th>Notes</th></tr></thead>
@@ -713,6 +843,20 @@ tau_malignant = <span class="num">0.35</span>  <span class="cmt"># cancer suspec
     <span class="section-label fade-up">References</span>
     <h2 class="section-title fade-up">Standing on <span class="c2">Evidence</span></h2>
     <div class="ref-list fade-up" id="ref-list"></div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="section auto-h" style="padding-top:3rem;padding-bottom:4rem;">
+  <div class="section-inner">
+    <div class="cta-box fade-up">
+      <h3>AI shouldn't work better on some people than others.</h3>
+      <p>PANDERMA is open research. If you're a clinician, a researcher, a dataset curator, or someone who believes AI should be fair — we want to hear from you. This problem is too important for one team to solve alone.</p>
+      <div class="cta-links">
+        <a href="https://github.com/irungugraceig-sudo/Panderma-showcase" target="_blank" class="cta-link primary">View on GitHub</a>
+        <a href="#team" class="cta-link secondary">Connect With Us</a>
+      </div>
+    </div>
   </div>
 </section>
 
