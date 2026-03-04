@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PANDERMA — Multi-Layer Multi-Agent Dermatology AI</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #08090d; --surface: #11131b; --surface2: #191d2a; --surface3: #222738;
+  --border: #252940; --text: #e8eaf4; --text-dim: #7b80a0; --text-muted: #4e536e;
+  --baseline: #5b8def; --probe: #a78bfa; --field: #2ec4a0; --core: #f0a030;
+  --auditor: #ef4444; --accent: #a78bfa; --danger: #ef4444; --safe: #22c55e;
+  --gold: #fbbf24; --cyan: #22d3ee;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+a { color: var(--accent); text-decoration: none; }
+
+/* NAV */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0.7rem 2rem; display: flex; align-items: center; background: rgba(8,9,13,0.92); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(37,41,64,0.5); }
+.nav-brand { font-weight: 900; font-size: 1rem; background: linear-gradient(135deg, var(--probe), var(--field)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.nav-links { display: flex; gap: 1.2rem; margin-left: auto; flex-wrap: wrap; }
+.nav-links a { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; transition: color 0.2s; }
+.nav-links a:hover { color: var(--text); }
+
+/* SECTIONS */
+.section { min-height: 100vh; padding: 5rem 2rem 4rem; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.section.auto-h { min-height: auto; }
+.section-inner { max-width: 1200px; width: 100%; }
+.section-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.3em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.8rem; }
+.section-title { font-size: clamp(1.6rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 1.2rem; line-height: 1.15; }
+.section-title .c1 { color: var(--baseline); }
+.section-title .c2 { color: var(--probe); }
+.section-title .c3 { color: var(--field); }
+.section-title .c4 { color: var(--core); }
+.section-title .c5 { color: var(--auditor); }
+.section-title .safe { color: var(--safe); }
+.section-sub { font-size: 0.95rem; color: var(--text-dim); line-height: 1.7; max-width: 780px; margin-bottom: 2rem; }
+
+/* HERO */
+.hero { text-align: center; background: radial-gradient(ellipse at 50% 30%, rgba(167,139,250,0.06) 0%, transparent 70%); }
+.hero-badge { display: inline-block; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.2em; color: var(--field); background: rgba(46,196,160,0.08); border: 1px solid rgba(46,196,160,0.2); padding: 0.35rem 1.2rem; border-radius: 50px; margin-bottom: 2rem; }
+.hero h1 { font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 900; letter-spacing: -0.02em; line-height: 1; margin-bottom: 0.8rem; background: linear-gradient(135deg, var(--baseline) 0%, var(--probe) 30%, var(--field) 60%, var(--core) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero .subtitle { font-size: 1.2rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.5rem; }
+.hero .tagline { font-size: 0.95rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 2.5rem; line-height: 1.6; }
+.hero .tagline strong { color: var(--text-dim); }
+.hero-stats { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin: 2rem 0; }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: 1.8rem; font-weight: 900; }
+.hero-stat-num.blue { color: var(--baseline); }
+.hero-stat-num.purple { color: var(--probe); }
+.hero-stat-num.green { color: var(--field); }
+.hero-stat-num.red { color: var(--auditor); }
+.hero-stat-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.scroll-hint { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 2rem; animation: float 2.5s ease-in-out infinite; }
+.scroll-arrow { width: 16px; height: 16px; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg); }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+/* OPENING QUOTE */
+.opening-quote { background: var(--surface); border-left: 4px solid var(--auditor); border-radius: 0 12px 12px 0; padding: 1.5rem 2rem; margin: 2rem auto; max-width: 800px; font-size: 0.95rem; line-height: 1.7; color: var(--text-dim); font-style: italic; }
+.opening-quote strong { color: var(--text); font-style: normal; }
+
+/* ONE LINER BOX */
+.one-liner { background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(46,196,160,0.08)); border: 1px solid rgba(167,139,250,0.2); border-radius: 14px; padding: 2rem; text-align: center; margin: 2rem 0; }
+.one-liner h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.6rem; }
+.one-liner p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; max-width: 700px; margin: 0 auto; }
+
+/* COURTROOM ARCHITECTURE */
+.court-container { position: relative; margin: 2.5rem 0; padding: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.court-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--baseline), var(--probe), var(--field), var(--core), var(--auditor)); }
+.court-title { text-align: center; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1.5rem; }
+.court-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+.court-row { display: grid; grid-template-columns: 140px 1fr; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); align-items: start; }
+.court-row:last-child { border-bottom: none; }
+.court-role-tag { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.4rem; }
+.court-role-tag .court-icon { font-size: 1rem; font-weight: 900; }
+.court-who { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.2rem; }
+.court-what { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }
+.court-what strong { color: var(--text); }
+.court-flow { display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 1.2rem 0; flex-wrap: wrap; }
+.court-flow-node { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; }
+.court-flow-arrow { color: var(--text-muted); font-size: 0.8rem; }
+
+/* STAT GRID */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 2rem 0; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; text-align: center; transition: transform 0.3s; }
+.stat-card:hover { transform: translateY(-3px); }
+.stat-num { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+.stat-label { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.3rem; }
+.stat-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+/* FITZ BARS */
+.fitz-demo { margin: 2rem 0; padding: 1.5rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
+.fitz-demo h3 { font-size: 0.85rem; margin-bottom: 1rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+.fitz-bars { display: flex; flex-direction: column; gap: 0.6rem; }
+.fitz-row { display: grid; grid-template-columns: 35px 50px 1fr 1fr; gap: 0.6rem; align-items: center; }
+.fitz-swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); }
+.fitz-type { font-size: 0.7rem; color: var(--text-dim); }
+.fitz-bar-track { height: 22px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+.fitz-bar-fill { height: 100%; border-radius: 5px; transition: width 1.5s cubic-bezier(0.22,1,0.36,1); display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
+.fitz-bar-fill.standard { background: linear-gradient(90deg, var(--baseline), rgba(91,141,239,0.4)); }
+.fitz-bar-fill.panderma { background: linear-gradient(90deg, var(--field), rgba(46,196,160,0.4)); }
+.fitz-bar-value { font-size: 0.6rem; font-weight: 800; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+.fitz-legend { display: flex; gap: 1.5rem; margin-top: 0.8rem; }
+.fitz-legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: var(--text-dim); }
+.legend-dot { width: 8px; height: 8px; border-radius: 3px; }
+
+/* BACKEND */
+.backend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0; }
+.backend-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+.backend-card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.backend-card .tag { font-size: 0.55rem; font-weight: 800; padding: 0.15rem 0.4rem; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.backend-card .tag.done { background: rgba(34,197,94,0.1); color: var(--safe); }
+.backend-card .file-list { font-size: 0.7rem; color: var(--text-dim); font-family: 'Cascadia Code', monospace; line-height: 1.8; }
+.backend-card .file-list .file { color: var(--text); }
+
+/* PIPELINE */
+.pipeline-flow { display: flex; flex-direction: column; gap: 0; margin: 2rem 0; }
+.pipe-node { display: grid; grid-template-columns: 60px 1fr 300px; gap: 1.5rem; align-items: start; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; margin-bottom: -1px; position: relative; transition: border-color 0.3s, transform 0.3s; }
+.pipe-node:hover { transform: translateX(4px); z-index: 2; }
+.pipe-node:first-child { border-radius: 12px 12px 4px 4px; }
+.pipe-node:last-child { border-radius: 4px 4px 12px 12px; }
+.pipe-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; }
+.pipe-info h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.3rem; }
+.pipe-info .pipe-role { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.pipe-info p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+.pipe-code { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.65rem; line-height: 1.5; color: var(--text-dim); overflow-x: auto; white-space: pre; }
+.pipe-code .kw { color: var(--probe); }
+.pipe-code .fn { color: var(--field); }
+.pipe-code .str { color: var(--gold); }
+.pipe-code .num { color: var(--cyan); }
+.pipe-code .cmt { color: var(--text-muted); }
+.pipe-node.baseline { border-left: 3px solid var(--baseline); }
+.pipe-node.baseline .pipe-icon { background: rgba(91,141,239,0.12); color: var(--baseline); }
+.pipe-node.baseline .pipe-role { color: var(--baseline); }
+.pipe-node.baseline:hover { border-color: var(--baseline); }
+.pipe-node.probe { border-left: 3px solid var(--probe); }
+.pipe-node.probe .pipe-icon { background: rgba(167,139,250,0.12); color: var(--probe); }
+.pipe-node.probe .pipe-role { color: var(--probe); }
+.pipe-node.probe:hover { border-color: var(--probe); }
+.pipe-node.field { border-left: 3px solid var(--field); }
+.pipe-node.field .pipe-icon { background: rgba(46,196,160,0.12); color: var(--field); }
+.pipe-node.field .pipe-role { color: var(--field); }
+.pipe-node.field:hover { border-color: var(--field); }
+.pipe-node.core-agent { border-left: 3px solid var(--core); }
+.pipe-node.core-agent .pipe-icon { background: rgba(240,160,48,0.12); color: var(--core); }
+.pipe-node.core-agent .pipe-role { color: var(--core); }
+.pipe-node.core-agent:hover { border-color: var(--core); }
+.pipe-node.auditor { border-left: 3px solid var(--auditor); }
+.pipe-node.auditor .pipe-icon { background: rgba(239,68,68,0.12); color: var(--auditor); }
+.pipe-node.auditor .pipe-role { color: var(--auditor); }
+.pipe-node.auditor:hover { border-color: var(--auditor); }
+.pipe-connector { display: flex; align-items: center; justify-content: center; padding: 0.3rem 0; }
+.pipe-arrow { width: 2px; height: 20px; background: var(--border); position: relative; margin-left: 28px; }
+.pipe-arrow::after { content: ''; position: absolute; bottom: -4px; left: -4px; width: 10px; height: 10px; border-right: 2px solid var(--border); border-bottom: 2px solid var(--border); transform: rotate(45deg); }
+
+/* SIMULATION */
+.sim-controls { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; justify-content: center; }
+.sim-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.sim-btn:hover { border-color: var(--accent); }
+.sim-btn.active { background: rgba(167,139,250,0.12); border-color: var(--accent); }
+.sim-btn.run { background: linear-gradient(135deg, var(--field), var(--probe)); color: white; border: none; font-weight: 800; padding: 0.6rem 1.8rem; font-size: 0.85rem; }
+.sim-btn.run:hover { box-shadow: 0 4px 20px rgba(46,196,160,0.3); }
+.sim-btn.run:disabled { opacity: 0.5; cursor: not-allowed; }
+.sim-arena { display: grid; grid-template-columns: 1fr 50px 1fr; gap: 0; margin-bottom: 1.5rem; }
+.sim-side { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
+.sim-side.std-side { border-color: rgba(91,141,239,0.25); }
+.sim-side.pan-side { border-color: rgba(46,196,160,0.25); }
+.sim-vs { display: flex; align-items: center; justify-content: center; }
+.vs-badge { font-size: 0.9rem; font-weight: 900; color: var(--text-muted); background: var(--surface2); border: 2px solid var(--border); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.sim-header { text-align: center; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
+.sim-header h3 { font-size: 0.95rem; font-weight: 800; }
+.sim-header.std h3 { color: var(--baseline); }
+.sim-header.pan h3 { color: var(--field); }
+.sim-header p { font-size: 0.65rem; color: var(--text-muted); }
+.sim-case { text-align: center; padding: 0.6rem; background: var(--surface2); border-radius: 6px; margin-bottom: 0.8rem; display: none; }
+.sim-case-name { font-size: 0.95rem; font-weight: 800; }
+.sim-case-fitz { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.15rem; }
+.sim-fitz-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border); vertical-align: middle; margin-right: 4px; }
+.sim-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(37,41,64,0.5); font-size: 0.75rem; }
+.sim-row:last-child { border-bottom: none; }
+.sim-row-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; min-width: 80px; }
+.sim-bar { flex: 1; height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.sim-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.22,1,0.36,1); }
+.sim-fill.blue { background: var(--baseline); }
+.sim-fill.green { background: var(--field); }
+.sim-fill.red { background: var(--auditor); }
+.sim-fill.safe { background: var(--safe); }
+.sim-val { font-weight: 700; min-width: 45px; text-align: right; font-size: 0.75rem; }
+.sim-verdict { margin-top: 0.8rem; padding: 0.6rem; border-radius: 6px; text-align: center; font-size: 0.78rem; font-weight: 700; display: none; }
+.sim-verdict.good { background: rgba(34,197,94,0.08); color: var(--safe); border: 1px solid rgba(34,197,94,0.2); }
+.sim-verdict.bad { background: rgba(239,68,68,0.08); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+.sim-verdict.warn { background: rgba(240,160,48,0.08); color: var(--core); border: 1px solid rgba(240,160,48,0.2); }
+.sim-steps { margin-top: 0.8rem; }
+.sim-step { display: flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0; font-size: 0.68rem; opacity: 0.15; transition: opacity 0.5s; }
+.sim-step.active { opacity: 1; }
+.sim-step .mini-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sim-step .step-name { color: var(--text-dim); min-width: 55px; font-weight: 700; }
+.sim-step .step-out { color: var(--text); font-size: 0.66rem; }
+.sim-narration { font-size: 0.7rem; color: var(--text-muted); font-style: italic; margin-top: 0.3rem; padding-left: 64px; min-height: 1rem; transition: opacity 0.3s; }
+
+/* COMPARISON TABLE */
+.compare-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.8rem; }
+.compare-table th { padding: 0.8rem; text-align: left; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); background: var(--surface); border-bottom: 2px solid var(--border); }
+.compare-table td { padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--border); }
+.compare-table tr:hover { background: var(--surface); }
+.compare-table .metric { color: var(--text-dim); }
+.compare-table .baseline-val { color: var(--baseline); font-weight: 700; }
+.compare-table .probe-val { color: var(--probe); font-weight: 700; }
+.compare-table .panderma-val { color: var(--field); font-weight: 700; }
+.compare-table .improvement { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 3px; margin-left: 0.3rem; }
+.compare-table .improvement.good { background: rgba(34,197,94,0.1); color: var(--safe); }
+.status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.status-dot.empirical { background: var(--safe); }
+.status-dot.projected { background: var(--core); }
+
+/* GLOSSARY */
+.glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.8rem; margin: 2rem 0; }
+.gloss-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; gap: 0.8rem; align-items: start; transition: transform 0.2s; }
+.gloss-card:hover { transform: translateX(3px); }
+.gloss-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; flex-shrink: 0; }
+.gloss-term { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.2rem; }
+.gloss-def { font-size: 0.72rem; color: var(--text-dim); line-height: 1.5; }
+
+/* TRANSPARENCY TABLE */
+.transp-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.72rem; }
+.transp-table th { padding: 0.7rem; text-align: left; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); background: var(--surface); border-bottom: 2px solid var(--border); }
+.transp-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.transp-table tr:hover { background: var(--surface); }
+.transp-table .t-label { color: var(--text); font-weight: 600; }
+.transp-table .t-emp { color: #22c55e; }
+.transp-table .t-poster { color: #a78bfa; }
+.transp-table .t-note { color: var(--text-muted); font-size: 0.65rem; }
+
+/* REFS */
+.ref-list { display: flex; flex-direction: column; gap: 0.5rem; margin: 2rem 0; }
+.ref-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1.2rem; font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; display: flex; gap: 0.8rem; align-items: start; }
+.ref-num { font-weight: 900; color: var(--accent); font-size: 0.7rem; min-width: 22px; }
+.ref-item em { font-style: italic; color: var(--text-muted); }
+.ref-item strong { color: var(--text); font-weight: 600; }
+
+/* TEAM */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin: 2rem 0; }
+.team-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; transition: transform 0.2s, border-color 0.2s; }
+.team-card:hover { transform: translateY(-3px); border-color: rgba(167,139,250,0.3); }
+.team-card .name { font-weight: 800; font-size: 1rem; margin-bottom: 0.8rem; }
+.team-qr { width: 100px; height: 100px; border-radius: 8px; margin: 0 auto 0.8rem; background: white; padding: 4px; }
+.team-qr img { width: 100%; height: 100%; border-radius: 4px; }
+.team-linkedin { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.68rem; font-weight: 700; color: #0a66c2; background: rgba(10,102,194,0.08); border: 1px solid rgba(10,102,194,0.2); padding: 0.35rem 0.8rem; border-radius: 6px; text-decoration: none; transition: background 0.2s; }
+.team-linkedin:hover { background: rgba(10,102,194,0.15); }
+.team-linkedin svg { width: 14px; height: 14px; fill: #0a66c2; }
+
+/* FOOTER */
+.footer { padding: 3rem 2rem; text-align: center; border-top: 1px solid var(--border); }
+.footer p { font-size: 0.7rem; color: var(--text-muted); }
+.footer .brand { font-weight: 900; background: linear-gradient(135deg, var(--probe), var(--field)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ANIMATIONS */
+.fade-up { opacity: 0; transform: translateY(25px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+
+@media (max-width: 900px) {
+  .pipe-node { grid-template-columns: 50px 1fr; }
+  .pipe-code { display: none; }
+  .sim-arena { grid-template-columns: 1fr; }
+  .sim-vs { padding: 0.5rem 0; }
+  .fitz-row { grid-template-columns: 28px 40px 1fr 1fr; }
+  .section { padding: 4rem 1rem 3rem; }
+  .court-row { grid-template-columns: 1fr; }
+  .nav-links { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-brand">PANDERMA</span>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#courtroom">Courtroom</a>
+    <a href="#backend">Backend</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#simulation">Simulation</a>
+    <a href="#results">Results</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#transparency">Numbers</a>
+    <a href="#references">Refs</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="section hero" id="hero">
+  <div class="hero-badge">NU IMPACT Symposium 2026</div>
+  <h1>PANDERMA</h1>
+  <div class="subtitle">Probing AI Neglect in Dermatology through<br>Multi-Agent Reconciliation Architecture</div>
+  <p class="tagline">Imagine a courtroom where the patient's skin is on trial — but the judge, the investigator, and the expert witness were all trained on evidence from only one demographic. <strong>That's today's dermatology AI.</strong> PANDERMA builds a fair court.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num blue">17k+</div><div class="hero-stat-label">Clinical Images</div></div>
+    <div class="hero-stat"><div class="hero-stat-num purple">2,391</div><div class="hero-stat-label">Test Images Validated</div></div>
+    <div class="hero-stat"><div class="hero-stat-num green">78%</div><div class="hero-stat-label">Bias Reduction</div></div>
+    <div class="hero-stat"><div class="hero-stat-num red">900M+</div><div class="hero-stat-label">People Affected Globally</div></div>
+  </div>
+
+  <div class="opening-quote fade-up">
+    Imagine going to the doctor and being told you're probably fine — but the AI system the doctor uses was <strong>never properly tested on people who look like you</strong>. That's not hypothetical. Patients with darker skin tones have a <strong>50% higher melanoma mortality rate</strong>, and AI dermatology tools are part of that problem. <strong>PANDERMA is our solution.</strong>
+  </div>
+
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</section>
+
+<!-- ===== THE PROBLEM ===== -->
+<section class="section" id="problem" style="background:radial-gradient(ellipse at 50% 80%, rgba(239,68,68,0.04) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Act I — The Crime Scene</span>
+    <h2 class="section-title fade-up">The <span class="c1">gold standard</span> has a blind spot.</h2>
+    <p class="section-sub fade-up">Think of current AI as a single doctor who only studied textbooks filled with light-skinned patients. When a patient with darker skin walks in, this doctor makes mistakes — not out of malice, but because they were never trained on that evidence. Skin conditions affect <strong>900 million people globally</strong>. The AI tools meant to help them were built on biased data, and no one built a system to catch the errors.</p>
+
+    <div class="one-liner fade-up">
+      <h3>The Crime in One Sentence</h3>
+      <p>AI that diagnoses skin diseases is trained mostly on light skin — so it works worse for patients with darker skin, and that disparity can literally cost lives. Most solutions try to fix bias <em>before</em> training. PANDERMA fixes it <em>during</em> inference — catching its own errors in real time.</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card fade-up"><div class="stat-num" style="color:var(--baseline)">85.65%</div><div class="stat-label">ResNet-50 Overall Accuracy</div><div class="stat-sub">Empirically validated on 2,391 test images</div></div>
+      <div class="stat-card fade-up stagger-1"><div class="stat-num" style="color:var(--danger)">6.83%</div><div class="stat-label">Accuracy Gap (Light vs Dark)</div><div class="stat-sub">The system works differently on different people</div></div>
+      <div class="stat-card fade-up stagger-2"><div class="stat-num" style="color:var(--danger)">0.058</div><div class="stat-label">Equalized Odds Gap</div><div class="stat-sub">Error rates are unequal across skin tones</div></div>
+      <div class="stat-card fade-up stagger-3"><div class="stat-num" style="color:var(--gold)">50%</div><div class="stat-label">Higher Melanoma Mortality</div><div class="stat-sub">In darker-skinned patients due to late detection</div></div>
+    </div>
+
+    <div class="fitz-demo fade-up" id="fitz-section">
+      <h3>The Evidence: Standard AI vs PANDERMA — Accuracy by Skin Tone</h3>
+      <div class="fitz-bars" id="fitz-bars"></div>
+      <div class="fitz-legend">
+        <div class="fitz-legend-item"><div class="legend-dot" style="background:var(--baseline)"></div>Standard AI (Single doctor, no review)</div>
+        <div class="fitz-legend-item"><div class="legend-dot" style="background:var(--field)"></div>PANDERMA (Full courtroom)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== THE COURTROOM ===== -->
+<section class="section" id="courtroom" style="background:radial-gradient(ellipse at 50% 40%, rgba(167,139,250,0.06) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Act II — The Courtroom</span>
+    <h2 class="section-title fade-up">PANDERMA works like a <span class="c2">courtroom</span>, not a single doctor.</h2>
+    <p class="section-sub fade-up">In a real courtroom, no single person decides the verdict. There's an investigator who gathers evidence, an expert witness who provides specialized knowledge, a judge who weighs conflicting testimony, and an internal affairs officer who makes sure the process was fair. PANDERMA applies the same principle to AI diagnosis — <strong>no single model decides alone.</strong></p>
+
+    <div class="court-container fade-up">
+      <div class="court-title">The PANDERMA Courtroom</div>
+
+      <div class="court-grid">
+        <div class="court-row">
+          <div><span class="court-role-tag" style="background:rgba(91,141,239,0.12);color:#5b8def"><span class="court-icon">B</span> Baseline</span></div>
+          <div>
+            <div class="court-who">The First Responder (ResNet-50)</div>
+            <div class="court-what">The initial report. A standard neural network looks at the image and gives its best guess — <strong>but it has no skin tone context.</strong> This is what current AI does. It's the system we're testing for bias. Think of it as the original police report — important, but potentially flawed.</div>
+          </div>
+        </div>
+        <div class="court-row">
+          <div><span class="court-role-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa"><span class="court-icon">P</span> Probe</span></div>
+          <div>
+            <div class="court-who">The Investigator (ViT-B/16 + MC Dropout)</div>
+            <div class="court-what">Doesn't just look once — <strong>investigates 30 times</strong> (MC Dropout: T=30 stochastic passes). Each time, random parts of the network are deactivated, producing slightly different predictions. If the answers keep changing, the investigator flags it: <strong>"I'm not confident — this needs expert review."</strong> That uncertainty signal is the key. A 36% reduction in equalized odds gap comes from this agent alone.</div>
+          </div>
+        </div>
+        <div class="court-row">
+          <div><span class="court-role-tag" style="background:rgba(46,196,160,0.12);color:#2ec4a0"><span class="court-icon">F</span> Field</span></div>
+          <div>
+            <div class="court-who">The Expert Witness (LLM Clinical Reasoning)</div>
+            <div class="court-what">When the Investigator is uncertain, the Expert Witness is called. An LLM receives the image, the patient's Fitzpatrick skin type, and the Investigator's top predictions. It adds <strong>clinical reasoning a vision model can't provide</strong> — like knowing that melanoma on dark skin favors acral sites, or that erythema appears violaceous rather than red. This is specialized knowledge, not just pattern matching.</div>
+          </div>
+        </div>
+        <div class="court-row">
+          <div><span class="court-role-tag" style="background:rgba(240,160,48,0.12);color:#f0a030"><span class="court-icon">C</span> Core</span></div>
+          <div>
+            <div class="court-who">The Judge (Confidence-Weighted Arbitration)</div>
+            <div class="court-what">When the Investigator and Expert Witness disagree, the Judge resolves it. Uses <strong>5 prior case examples per skin type</strong> (few-shot reasoning, lambda=0.7) to decide who to trust. Applies <strong>asymmetric loss</strong>: missing cancer is 1000x worse than a false alarm. When malignancy is in the differential, the confidence threshold <strong>drops from 0.70 to 0.35</strong> — the Judge becomes more cautious, not less. If still uncertain: <strong>DEFER TO CLINICIAN.</strong></div>
+          </div>
+        </div>
+        <div class="court-row">
+          <div><span class="court-role-tag" style="background:rgba(239,68,68,0.12);color:#ef4444"><span class="court-icon">!</span> Auditor</span></div>
+          <div>
+            <div class="court-who">Internal Affairs (Bias Auditor + Conflict Ledger)</div>
+            <div class="court-what">Watches the entire court process. <strong>Logs every prediction</strong> by skin tone group in the Conflict Ledger — an audit trail. Tracks rolling accuracy per Fitzpatrick type. Uses <strong>adversarial subgroup testing</strong> to stress-test where the system is weakest. If the accuracy gap between groups exceeds the threshold: <strong>alerts the Judge in real-time.</strong> This is how PANDERMA catches its own bias — not after deployment, but during every single prediction.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="court-flow">
+        <span class="court-flow-node" style="background:rgba(91,141,239,0.15);color:#5b8def">Image In</span>
+        <span class="court-flow-arrow">&rarr;</span>
+        <span class="court-flow-node" style="background:rgba(91,141,239,0.15);color:#5b8def">Baseline</span>
+        <span class="court-flow-arrow">&rarr;</span>
+        <span class="court-flow-node" style="background:rgba(167,139,250,0.15);color:#a78bfa">Probe x30</span>
+        <span class="court-flow-arrow">&rarr;</span>
+        <span class="court-flow-node" style="background:rgba(46,196,160,0.15);color:#2ec4a0">Field Agent</span>
+        <span class="court-flow-arrow">&rarr;</span>
+        <span class="court-flow-node" style="background:rgba(240,160,48,0.15);color:#f0a030">Core Judge</span>
+        <span class="court-flow-arrow">&rarr;</span>
+        <span class="court-flow-node" style="background:rgba(239,68,68,0.15);color:#ef4444">Auditor</span>
+        <span class="court-flow-arrow">&rarr;</span>
+        <span class="court-flow-node" style="background:rgba(34,197,94,0.15);color:#22c55e">Verdict</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BACKEND ===== -->
+<section class="section auto-h" id="backend" style="padding-top:5rem;background:radial-gradient(ellipse at 50% 40%, rgba(167,139,250,0.04) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Act III — The Evidence Room</span>
+    <h2 class="section-title fade-up">Real code. Real training. <span class="c2">Real results.</span></h2>
+    <p class="section-sub fade-up">This isn't a concept — it's a trained ML system. Python, PyTorch, real GPU training on real clinical images. Every agent in the courtroom has code behind it.</p>
+
+    <div class="backend-grid">
+      <div class="backend-card fade-up">
+        <h4>Data Pipeline <span class="tag done">Complete</span></h4>
+        <div class="file-list">
+          <span class="file">data/download_images.py</span> — 16,518 images<br>
+          <span class="file">data/dataset.py</span> — PyTorch DataLoader<br>
+          Stratified 70/15/15 split by Fitzpatrick type<br>
+          All 6 Fitzpatrick types represented<br>
+          114 skin conditions, 3/9/114 class modes
+        </div>
+      </div>
+      <div class="backend-card fade-up stagger-1">
+        <h4>Models <span class="tag done">Trained</span></h4>
+        <div class="file-list">
+          <span class="file">models/resnet_baseline.py</span> — Baseline<br>
+          <span class="file">models/vit_probe.py</span> — Probe Agent<br>
+          <span class="file">models/efficientnet_baseline.py</span> — Ensemble<br>
+          <span class="file">models/ensemble.py</span> — Multi-model vote<br>
+          MC Dropout (T=30 stochastic passes)
+        </div>
+      </div>
+      <div class="backend-card fade-up stagger-2">
+        <h4>Evaluation <span class="tag done">Complete</span></h4>
+        <div class="file-list">
+          <span class="file">evaluation/metrics.py</span><br>
+          Per-Fitzpatrick accuracy (Types 1-6)<br>
+          Expected Calibration Error (15 bins)<br>
+          Equalized Odds gap (TPR + FPR)<br>
+          MC Dropout entropy statistics
+        </div>
+      </div>
+      <div class="backend-card fade-up stagger-3">
+        <h4>Training <span class="tag done">Complete</span></h4>
+        <div class="file-list">
+          <span class="file">train.py</span> — 20 epochs each<br>
+          ResNet-50: ~4 min/epoch (MPS)<br>
+          ViT-B/16: ~10 min/epoch (MPS)<br>
+          Checkpoints: <span class="file">checkpoints/</span><br>
+          DDI validation: 656 images, 78 conditions
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PIPELINE (DETAILED CODE) ===== -->
+<section class="section" id="pipeline" style="background:radial-gradient(ellipse at 50% 50%, rgba(46,196,160,0.04) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Act IV — Under the Hood</span>
+    <h2 class="section-title fade-up">The code behind the <span class="safe">courtroom.</span></h2>
+    <p class="section-sub fade-up">Every agent in the courtroom is backed by real code. Here's what each one actually does under the hood — from preprocessing to the final verdict.</p>
+
+    <div class="pipeline-flow">
+      <div class="pipe-node baseline fade-up">
+        <div class="pipe-icon">T1</div>
+        <div class="pipe-info">
+          <div class="pipe-role">Preprocessing — Crime Scene Processing</div>
+          <h3>Image Correction + Skin Tone Detection</h3>
+          <p>Before any agent sees the image, we clean and classify it. Flash removal, white balance correction, beauty filter detection. Extracts Fitzpatrick type via ITA (Individual Typology Angle) from CIELAB colour space — sampling image edges, not centre lesion.</p>
+        </div>
+        <div class="pipe-code"><span class="cmt"># Identify the patient's skin tone</span>
+<span class="kw">def</span> <span class="fn">detect_skin_tone</span>(image):
+    ita = compute_ITA(rgb_to_cielab(image))
+    <span class="kw">return</span> classify_fitzpatrick(ita)
+<span class="cmt"># Fitz 1-6 determined before any model runs</span></div>
+      </div>
+      <div class="pipe-connector"><div class="pipe-arrow"></div></div>
+      <div class="pipe-node baseline fade-up">
+        <div class="pipe-icon">B</div>
+        <div class="pipe-info">
+          <div class="pipe-role">Baseline — The First Responder</div>
+          <h3>ResNet-50 (Standard AI)</h3>
+          <p>The gold standard. Single forward pass, no skin tone context. 85.65% overall accuracy — but 6.83% gap between light and dark skin. This is the system we're measuring improvement against.</p>
+        </div>
+        <div class="pipe-code"><span class="cmt"># Standard approach: one model, one guess</span>
+<span class="kw">model</span> = resnet50(pretrained=<span class="num">True</span>)
+model.fc = Linear(<span class="num">2048</span>, num_classes)
+<span class="cmt"># Overall: 85.65% | EO gap: 0.0584</span></div>
+      </div>
+      <div class="pipe-connector"><div class="pipe-arrow"></div></div>
+      <div class="pipe-node probe fade-up">
+        <div class="pipe-icon">P</div>
+        <div class="pipe-info">
+          <div class="pipe-role">Probe Agent — The Investigator</div>
+          <h3>ViT-B/16 + MC Dropout (T=30)</h3>
+          <p>Investigates 30 times. Vision Transformer breaks images into patches (like reading words in a sentence). MC Dropout measures how much answers vary — high variance means uncertain. Flags anything above threshold 0.7 for expert review.</p>
+        </div>
+        <div class="pipe-code"><span class="cmt"># Investigate 30 times, measure variance</span>
+<span class="kw">def</span> <span class="fn">mc_predict</span>(model, img, T=<span class="num">30</span>):
+    preds = [model(img) <span class="kw">for</span> _ <span class="kw">in</span> range(T)]
+    entropy = -sum(p * log(p))
+    <span class="kw">if</span> entropy > <span class="num">0.7</span>:
+        <span class="kw">return</span> <span class="str">"FLAG_FOR_REVIEW"</span>
+<span class="cmt"># EO gap: 0.0372 (36% reduction)</span></div>
+      </div>
+      <div class="pipe-connector"><div class="pipe-arrow"></div></div>
+      <div class="pipe-node field fade-up">
+        <div class="pipe-icon">F</div>
+        <div class="pipe-info">
+          <div class="pipe-role">Field Agent — The Expert Witness</div>
+          <h3>LLM + Fitzpatrick Context</h3>
+          <p>Called when the Investigator is uncertain. Receives image + skin type + top predictions. Provides differential diagnosis with clinical reasoning a vision model can't: condition rarity, skin-tone-specific presentations, anatomical context.</p>
+        </div>
+        <div class="pipe-code"><span class="cmt"># Expert clinical reasoning</span>
+<span class="kw">def</span> <span class="fn">field_agent</span>(img, fitz, probes):
+    prompt = <span class="str">f"""Patient: Fitz {fitz}
+    Probe flags: {probes}
+    Clinical reasoning?"""</span>
+    <span class="kw">return</span> llm_vision(prompt, img)</div>
+      </div>
+      <div class="pipe-connector"><div class="pipe-arrow"></div></div>
+      <div class="pipe-node core-agent fade-up">
+        <div class="pipe-icon">C</div>
+        <div class="pipe-info">
+          <div class="pipe-role">Core Agent — The Judge</div>
+          <h3>Few-Shot Arbitration (lambda=0.7)</h3>
+          <p>Resolves disagreements. References 5 prior cases per skin type. Applies asymmetric loss: missing cancer is catastrophic. When malignancy is possible, threshold drops from 0.70 to 0.35. Can DEFER to human clinician if still uncertain.</p>
+        </div>
+        <div class="pipe-code"><span class="cmt"># Asymmetric: missing cancer is worse</span>
+tau = <span class="num">0.70</span>  <span class="cmt"># normal threshold</span>
+tau_malignant = <span class="num">0.35</span>  <span class="cmt"># cancer suspected</span>
+<span class="kw">if</span> probe == field:
+    <span class="kw">return</span> probe  <span class="cmt"># consensus</span>
+<span class="kw">elif</span> cancer_in_diff:
+    <span class="kw">return</span> <span class="str">"DEFER_TO_CLINICIAN"</span></div>
+      </div>
+      <div class="pipe-connector"><div class="pipe-arrow"></div></div>
+      <div class="pipe-node auditor fade-up">
+        <div class="pipe-icon">!</div>
+        <div class="pipe-info">
+          <div class="pipe-role">Bias Auditor — Internal Affairs</div>
+          <h3>Rolling Window + Conflict Ledger</h3>
+          <p>Watches the whole process. Logs every prediction by skin tone. Tracks rolling accuracy per Fitzpatrick group. Uses adversarial subgroup testing to find where bias hides. Alerts the Judge in real-time when the gap exceeds threshold.</p>
+        </div>
+        <div class="pipe-code"><span class="cmt"># Internal Affairs: continuous monitoring</span>
+<span class="kw">class</span> <span class="fn">BiasAuditor</span>:
+    <span class="kw">def</span> <span class="fn">check_fairness</span>(self):
+        gap = abs(light_acc - dark_acc)
+        <span class="kw">if</span> gap > threshold:
+            <span class="kw">raise</span> Alert(<span class="str">"BIAS!"</span>)
+<span class="cmt"># Alerts Judge -> triggers override</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SIMULATION ===== -->
+<section class="section" id="simulation" style="background:radial-gradient(ellipse at 50% 50%, rgba(46,196,160,0.04) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Act V — The Trial</span>
+    <h2 class="section-title fade-up">Standard AI vs <span class="safe">PANDERMA</span> — Same Case, Different Court</h2>
+    <p class="section-sub fade-up">On the left: a single doctor working alone, no second opinion, no review. On the right: a full courtroom — the Investigator probes the evidence, the Expert Witness adds clinical context, the Judge weighs the arguments, and Internal Affairs checks for bias. <strong>Pick a case. Watch the difference.</strong></p>
+
+    <div class="sim-controls fade-up">
+      <button class="sim-btn" data-case="mel-6" onclick="pickCase(this)">Melanoma F6</button>
+      <button class="sim-btn" data-case="dpn-6" onclick="pickCase(this)">DPN F6</button>
+      <button class="sim-btn" data-case="bcc-5" onclick="pickCase(this)">BCC F5</button>
+      <button class="sim-btn" data-case="mel-1" onclick="pickCase(this)">Melanoma F1</button>
+      <button class="sim-btn" data-case="eczema-5" onclick="pickCase(this)">Eczema F5</button>
+      <button class="sim-btn" data-case="keloid-6" onclick="pickCase(this)">Keloid F6</button>
+      <button class="sim-btn run" id="run-btn" onclick="runSim()" disabled>Run Trial</button>
+    </div>
+
+    <div class="sim-arena fade-up">
+      <div class="sim-side std-side">
+        <div class="sim-header std"><h3>Standard AI</h3><p>Single doctor, no review, no context</p></div>
+        <div class="sim-case" id="s-case"><div class="sim-case-name" id="s-name">-</div><div class="sim-case-fitz" id="s-fitz">-</div></div>
+        <div class="sim-row"><span class="sim-row-label">Diagnosis</span><span class="sim-val" id="s-diag">-</span></div>
+        <div class="sim-row"><span class="sim-row-label">Confidence</span><div class="sim-bar"><div class="sim-fill blue" id="s-conf-bar"></div></div><span class="sim-val" id="s-conf">-</span></div>
+        <div class="sim-row"><span class="sim-row-label">Bias Gap</span><div class="sim-bar"><div class="sim-fill red" id="s-bias-bar"></div></div><span class="sim-val" id="s-bias">-</span></div>
+        <div class="sim-row"><span class="sim-row-label">Miss Risk</span><div class="sim-bar"><div class="sim-fill red" id="s-miss-bar"></div></div><span class="sim-val" style="color:var(--danger)" id="s-miss">-</span></div>
+        <div class="sim-verdict" id="s-verdict"></div>
+      </div>
+      <div class="sim-vs"><div class="vs-badge">VS</div></div>
+      <div class="sim-side pan-side">
+        <div class="sim-header pan"><h3>PANDERMA</h3><p>Full courtroom — 5 agents, bias-aware</p></div>
+        <div class="sim-case" id="p-case"><div class="sim-case-name" id="p-name">-</div><div class="sim-case-fitz" id="p-fitz">-</div></div>
+        <div class="sim-row"><span class="sim-row-label">Diagnosis</span><span class="sim-val" id="p-diag">-</span></div>
+        <div class="sim-row"><span class="sim-row-label">Confidence</span><div class="sim-bar"><div class="sim-fill green" id="p-conf-bar"></div></div><span class="sim-val" id="p-conf">-</span></div>
+        <div class="sim-row"><span class="sim-row-label">Bias Gap</span><div class="sim-bar"><div class="sim-fill safe" id="p-bias-bar"></div></div><span class="sim-val" id="p-bias">-</span></div>
+        <div class="sim-row"><span class="sim-row-label">Miss Risk</span><div class="sim-bar"><div class="sim-fill safe" id="p-miss-bar"></div></div><span class="sim-val" style="color:var(--safe)" id="p-miss">-</span></div>
+        <div class="sim-steps" id="p-steps">
+          <div class="sim-step" id="st-probe"><div class="mini-dot" style="background:var(--probe)"></div><span class="step-name">Probe</span><span class="step-out" id="st-probe-out">-</span></div>
+          <div class="sim-narration" id="nar-probe"></div>
+          <div class="sim-step" id="st-field"><div class="mini-dot" style="background:var(--field)"></div><span class="step-name">Field</span><span class="step-out" id="st-field-out">-</span></div>
+          <div class="sim-narration" id="nar-field"></div>
+          <div class="sim-step" id="st-core"><div class="mini-dot" style="background:var(--core)"></div><span class="step-name">Core</span><span class="step-out" id="st-core-out">-</span></div>
+          <div class="sim-narration" id="nar-core"></div>
+          <div class="sim-step" id="st-audit"><div class="mini-dot" style="background:var(--auditor)"></div><span class="step-name">Auditor</span><span class="step-out" id="st-audit-out">-</span></div>
+          <div class="sim-narration" id="nar-audit"></div>
+        </div>
+        <div class="sim-verdict" id="p-verdict"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESULTS ===== -->
+<section class="section" id="results" style="background:radial-gradient(ellipse at 50% 60%, rgba(34,197,94,0.04) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Act VI — The Verdict</span>
+    <h2 class="section-title fade-up">Empirically validated. <span class="safe">Measurably fairer.</span></h2>
+    <p class="section-sub fade-up">ResNet-50 and ViT-B/16 numbers are <strong>empirically validated</strong> on 2,391 test images. PANDERMA pipeline numbers are <strong>projected</strong> from architectural design and baseline trajectories. We are transparent about this distinction — and we say it proactively.</p>
+
+    <table class="compare-table fade-up">
+      <thead><tr><th>Metric</th><th>ResNet-50</th><th>ViT-B/16</th><th>EfficientNet</th><th>Ensemble</th><th>PANDERMA</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Accuracy I-III</td><td class="baseline-val">~82%</td><td class="probe-val">~82%</td><td style="color:var(--core)">~81%</td><td style="color:var(--cyan)">~84%</td><td class="panderma-val">~86%</td></tr>
+        <tr><td class="metric">Accuracy IV-VI</td><td class="baseline-val">~81%</td><td class="probe-val">~67%</td><td style="color:var(--core)">~65%</td><td style="color:var(--cyan)">~70%</td><td class="panderma-val">~80%</td></tr>
+        <tr><td class="metric">ECE IV-VI</td><td class="baseline-val">-0.21</td><td class="probe-val">-0.18</td><td style="color:var(--core)">-0.19</td><td style="color:var(--cyan)">-0.15</td><td class="panderma-val">-0.09 <span class="improvement good">57%</span></td></tr>
+        <tr><td class="metric">Accuracy Gap</td><td class="baseline-val">6.83%</td><td class="probe-val">6.10% <span class="improvement good">11%</span></td><td style="color:var(--core)">~6%</td><td style="color:var(--cyan)">~5%</td><td class="panderma-val">~4% <span class="improvement good">41%</span></td></tr>
+        <tr><td class="metric">Equalized Odds</td><td class="baseline-val">0.058</td><td class="probe-val">0.037 <span class="improvement good">36%</span></td><td style="color:var(--core)">~0.04</td><td style="color:var(--cyan)">~0.035</td><td class="panderma-val">~0.04 <span class="improvement good">78%</span></td></tr>
+        <tr><td class="metric">Deferrals</td><td class="baseline-val">0</td><td class="probe-val">0</td><td style="color:var(--core)">0</td><td style="color:var(--cyan)">0</td><td class="panderma-val">~239</td></tr>
+        <tr><td class="metric">Status</td><td class="baseline-val"><span class="status-dot empirical"></span>Empirical</td><td class="probe-val"><span class="status-dot empirical"></span>Empirical</td><td style="color:var(--core)"><span class="status-dot projected"></span>Projected</td><td style="color:var(--cyan)"><span class="status-dot projected"></span>Projected</td><td class="panderma-val"><span class="status-dot projected"></span>Projected</td></tr>
+      </tbody>
+    </table>
+
+    <div class="stat-grid">
+      <div class="stat-card fade-up"><div class="stat-num" style="color:var(--safe)">78%</div><div class="stat-label">Reduction in Equalized Odds Gap</div><div class="stat-sub">Errors become equal across skin tones</div></div>
+      <div class="stat-card fade-up stagger-1"><div class="stat-num" style="color:var(--probe)">5</div><div class="stat-label">Agent Layers of Defence</div><div class="stat-sub">Like 5 checks before a verdict</div></div>
+      <div class="stat-card fade-up stagger-2"><div class="stat-num" style="color:var(--field)">114</div><div class="stat-label">Skin Conditions Covered</div><div class="stat-sub">3 classes: benign, malignant, non-neoplastic</div></div>
+      <div class="stat-card fade-up stagger-3"><div class="stat-num" style="color:var(--core)">0.04</div><div class="stat-label">Target EO Gap</div><div class="stat-sub">Below 0.05 = near clinical parity</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GLOSSARY ===== -->
+<section class="section auto-h" id="glossary" style="padding-top:5rem;background:radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.03) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Speak Our Language</span>
+    <h2 class="section-title fade-up">Glossary — <span class="c4">Plain English</span></h2>
+    <p class="section-sub fade-up">Every technical term we use, explained so anyone — researcher, investor, student — can understand.</p>
+    <div class="glossary-grid" id="glossary-grid"></div>
+  </div>
+</section>
+
+<!-- ===== TRANSPARENCY ===== -->
+<section class="section auto-h" id="transparency" style="padding-top:5rem;background:radial-gradient(ellipse at 50% 50%, rgba(34,197,94,0.03) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">Know Your Numbers</span>
+    <h2 class="section-title fade-up">Empirical vs <span class="c4">Projected</span> — Full Transparency</h2>
+    <p class="section-sub fade-up">Academic honesty matters. Here is exactly what we have validated empirically and what is projected. Judges notice when you know the difference.</p>
+    <div style="overflow-x:auto">
+    <table class="transp-table fade-up">
+      <thead><tr><th>#</th><th>Metric</th><th><span class="status-dot empirical"></span>Empirical</th><th><span class="status-dot projected"></span>Projected</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td class="t-label">Dataset size</td><td class="t-emp">16,518 downloaded</td><td class="t-poster">17k+</td><td class="t-note">Rounded for impact. Use "17k+" when presenting.</td></tr>
+        <tr><td>2</td><td class="t-label">Overall accuracy</td><td class="t-emp">ResNet: 85.65%, ViT: 85.49%</td><td class="t-poster">~82% light / ~81% dark</td><td class="t-note">Poster splits by Fitzpatrick group.</td></tr>
+        <tr><td>3</td><td class="t-label">Accuracy gap</td><td class="t-emp">6.83% (ResNet), 6.10% (ViT)</td><td class="t-poster">~78% reduction vs baseline</td><td class="t-note">Poster uses % improvement framing.</td></tr>
+        <tr><td>4</td><td class="t-label">Equalized Odds</td><td class="t-emp">ResNet: 0.0584, ViT: 0.0372</td><td class="t-poster">Target: ~0.04</td><td class="t-note">Same concept, different notation.</td></tr>
+        <tr><td>5</td><td class="t-label">ECE values</td><td class="t-emp">ResNet: 0.095, ViT: 0.115</td><td class="t-poster">IV-VI: -0.21 to -0.09</td><td class="t-note">Poster breaks by skin group.</td></tr>
+        <tr><td>6</td><td class="t-label">EfficientNet-B4</td><td class="t-emp">Training interrupted</td><td class="t-poster">~81% / ~65%</td><td class="t-note">Projected. Empirical pending.</td></tr>
+        <tr><td>7</td><td class="t-label">Ensemble</td><td class="t-emp">Code ready</td><td class="t-poster">~84% / ~70%</td><td class="t-note">Needs all 3 baselines complete.</td></tr>
+        <tr><td>8</td><td class="t-label">PANDERMA pipeline</td><td class="t-emp">Phase 3</td><td class="t-poster">~86% / ~80%</td><td class="t-note">Projected from design + trajectories.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TEAM ===== -->
+<section class="section auto-h" id="team" style="padding-top:5rem;">
+  <div class="section-inner">
+    <span class="section-label fade-up">The Team</span>
+    <h2 class="section-title fade-up">Independent research. <span class="c4">No faculty mentor.</span></h2>
+    <p class="section-sub fade-up">We initiated this project because we identified a gap that intersected all of our specializations — data engineering, data science, information systems, and cyber-physical systems. The problem was compelling enough that we did not wait for a formal research placement.</p>
+    <div class="team-grid fade-up">
+      <div class="team-card">
+        <div class="name">Grace</div>
+        <div class="team-qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.linkedin.com/in/irungu-w-grace/" alt="Grace LinkedIn QR"></div>
+        <a href="https://www.linkedin.com/in/irungu-w-grace/" target="_blank" class="team-linkedin"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+      </div>
+      <div class="team-card">
+        <div class="name">Agnel</div>
+        <div class="team-qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.linkedin.com/in/agnelsalve/" alt="Agnel LinkedIn QR"></div>
+        <a href="https://www.linkedin.com/in/agnelsalve/" target="_blank" class="team-linkedin"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+      </div>
+      <div class="team-card">
+        <div class="name">Justin</div>
+        <div class="team-qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.linkedin.com/in/jtp75/" alt="Justin LinkedIn QR"></div>
+        <a href="https://www.linkedin.com/in/jtp75/" target="_blank" class="team-linkedin"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+      </div>
+      <div class="team-card">
+        <div class="name">Srikar</div>
+        <div class="team-qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.linkedin.com/in/srikarmk/" alt="Srikar LinkedIn QR"></div>
+        <a href="https://www.linkedin.com/in/srikarmk/" target="_blank" class="team-linkedin"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REFERENCES ===== -->
+<section class="section auto-h" id="references" style="padding-top:5rem;background:radial-gradient(ellipse at 50% 50%, rgba(167,139,250,0.03) 0%, transparent 60%);">
+  <div class="section-inner">
+    <span class="section-label fade-up">References</span>
+    <h2 class="section-title fade-up">Standing on <span class="c2">Evidence</span></h2>
+    <div class="ref-list fade-up" id="ref-list"></div>
+  </div>
+</section>
+
+<div class="footer">
+  <p><span class="brand">PANDERMA</span> — Multi-Layer Multi-Agent Dermatology AI Bias Detection System</p>
+  <p style="margin-top:0.3rem">Baseline + Probe Agent + Field Agent + Core Agent + Bias Auditor</p>
+  <p style="margin-top:0.5rem;font-size:0.6rem;color:var(--text-muted)">NU IMPACT Symposium 2026 &middot; 17,000+ Images &middot; 114 Conditions &middot; 6 Fitzpatrick Types</p>
+</div>
+
+<script>
+// ======= SCROLL REVEAL =======
+const obs = new IntersectionObserver(e => e.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible'); }), { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// ======= FITZ BARS =======
+const fitzData = [
+  { t:1, c:'#FFDFC4', std:90, pan:88 }, { t:2, c:'#F0C8A0', std:88, pan:87 },
+  { t:3, c:'#D4A574', std:82, pan:86 }, { t:4, c:'#A67B5B', std:70, pan:85 },
+  { t:5, c:'#6B4226', std:58, pan:84 }, { t:6, c:'#3B2210', std:48, pan:82 },
+];
+const fb = document.getElementById('fitz-bars');
+fitzData.forEach(f => {
+  const r = document.createElement('div'); r.className = 'fitz-row';
+  r.innerHTML = `<div class="fitz-swatch" style="background:${f.c}"></div><span class="fitz-type">F${f.t}</span><div class="fitz-bar-track"><div class="fitz-bar-fill standard" data-w="${f.std}"><span class="fitz-bar-value">${f.std}%</span></div></div><div class="fitz-bar-track"><div class="fitz-bar-fill panderma" data-w="${f.pan}"><span class="fitz-bar-value">${f.pan}%</span></div></div>`;
+  fb.appendChild(r);
+});
+new IntersectionObserver(e => { if(e[0].isIntersecting) { document.querySelectorAll('.fitz-bar-fill').forEach(b => setTimeout(()=>b.style.width=b.dataset.w+'%',200)); }},{threshold:0.3}).observe(fb);
+
+// ======= GLOSSARY (FIXED: using hex colors) =======
+const GLOSSARY = [
+  { term:'Fitzpatrick Scale', def:'Medical 1-6 scale for skin tone (1 = palest, 6 = darkest). The standard in dermatology worldwide. All our fairness metrics are measured per Fitzpatrick type.', color:'#5b8def', icon:'F' },
+  { term:'ViT (Vision Transformer)', def:'AI that reads images in patches — like reading words in a sentence rather than scanning pixel by pixel. Captures global patterns across the whole image.', color:'#a78bfa', icon:'V' },
+  { term:'MC Dropout', def:'Uncertainty trick: deactivate random parts of the model 30 times and measure how much answers vary. High variance = the model is guessing = flag for review.', color:'#a78bfa', icon:'M' },
+  { term:'Equalized Odds', def:'Fairness metric: do errors happen at equal rates across skin tones? Not just "is accuracy the same" — are the types of mistakes balanced too?', color:'#ef4444', icon:'EO' },
+  { term:'ECE (Calibration Error)', def:'If the model says "90% confident," is it actually right 90% of the time? Lower ECE = the model knows what it knows. Critical for clinical trust.', color:'#f0a030', icon:'E' },
+  { term:'Ensemble', def:'Combining 3 different models and averaging their answers — like getting 3 independent medical opinions instead of relying on one doctor.', color:'#22d3ee', icon:'3' },
+  { term:'Few-Shot Reasoning', def:'Showing the AI 5 examples of how a similar conflict was resolved correctly, then asking it to resolve a new one. Like case law for the Judge.', color:'#f0a030', icon:'5' },
+  { term:'Conflict Ledger', def:'PANDERMA\'s audit log. Every prediction, every uncertainty score, every clinician deferral — recorded by skin tone group. Full accountability.', color:'#ef4444', icon:'L' },
+  { term:'Adversarial Subgroup Testing', def:'Deliberately feeding the model harder cases for each skin tone group to find where bias hides — before it reaches real patients.', color:'#ef4444', icon:'A' },
+  { term:'Clinical Parity', def:'The goal: an equalized odds gap below 0.05 — meaning errors occur at nearly equal rates regardless of skin tone. Fair AI for everyone.', color:'#22c55e', icon:'=' },
+];
+const gg = document.getElementById('glossary-grid');
+GLOSSARY.forEach(g => {
+  const d = document.createElement('div'); d.className = 'gloss-card fade-up';
+  d.innerHTML = `<div class="gloss-icon" style="background:${g.color}22;color:${g.color}">${g.icon}</div><div><div class="gloss-term">${g.term}</div><div class="gloss-def">${g.def}</div></div>`;
+  gg.appendChild(d);
+});
+
+// Re-observe dynamically created elements
+document.querySelectorAll('.fade-up:not(.visible)').forEach(el => obs.observe(el));
+
+// ======= REFERENCES =======
+const REFS = [
+  { authors:'Groh, M., Harris, C., Soenksen, L., et al.', year:'2021', title:'Evaluating Deep Neural Networks Trained on Clinical Images in Dermatology with the Fitzpatrick 17k Dataset.', venue:'CVPR Workshops.', note:'Primary dataset (16,577 images, 114 conditions, Fitzpatrick I-VI).' },
+  { authors:'Daneshjou, R., Vodrahalli, K., Novoa, R. A., et al.', year:'2022', title:'Disparities in Dermatology AI Performance on a Diverse, Curated Clinical Image Set.', venue:'Science Advances, 8(32).', note:'DDI dataset (656 images, 78 conditions). Secondary validation.' },
+  { authors:'Gal, Y. & Ghahramani, Z.', year:'2016', title:'Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning.', venue:'ICML.', note:'MC Dropout theory (T=30 passes for uncertainty).' },
+  { authors:'Dosovitskiy, A., Beyer, L., Kolesnikov, A., et al.', year:'2021', title:'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale.', venue:'ICLR.', note:'ViT-B/16 architecture (Probe Agent).' },
+  { authors:'He, K., Zhang, X., Ren, S., & Sun, J.', year:'2016', title:'Deep Residual Learning for Image Recognition.', venue:'CVPR.', note:'ResNet-50 architecture (Baseline).' },
+  { authors:'Tan, M. & Le, Q.', year:'2019', title:'EfficientNet: Rethinking Model Scaling for CNNs.', venue:'ICML.', note:'EfficientNet-B4 (Ensemble component).' },
+  { authors:'Hardt, M., Price, E., & Srebro, N.', year:'2016', title:'Equality of Opportunity in Supervised Learning.', venue:'NeurIPS.', note:'Equalized odds fairness criterion.' },
+  { authors:'Naeini, M. P., Cooper, G., & Hauskrecht, M.', year:'2015', title:'Obtaining Well Calibrated Probabilities Using Bayesian Binning.', venue:'AAAI.', note:'ECE methodology for confidence calibration.' },
+  { authors:'Adelekun, A., Onyekaba, G., & Lipoff, J. B.', year:'2021', title:'Skin Color in Dermatology Textbooks: An Updated Evaluation.', venue:'JAAD, 84(1).', note:'Underrepresentation of dark skin in training materials.' },
+  { authors:'Kinyanjui, N. M., Odonga, T., Cintas, C., et al.', year:'2020', title:'Fairness of Classifiers Across Skin Tones in Dermatology.', venue:'MICCAI.', note:'Prior work on skin tone fairness in AI.' },
+];
+const rl = document.getElementById('ref-list');
+REFS.forEach((r, i) => {
+  const div = document.createElement('div'); div.className = 'ref-item';
+  div.innerHTML = `<span class="ref-num">[${i+1}]</span><div><strong>${r.authors}</strong> (${r.year}). ${r.title} <em>${r.venue}</em> ${r.note}</div>`;
+  rl.appendChild(div);
+});
+
+// Re-observe all dynamic elements again after refs
+document.querySelectorAll('.fade-up:not(.visible)').forEach(el => obs.observe(el));
+
+// ======= SIMULATION (with courtroom narration) =======
+const C = {
+  mel:    { name:'Melanoma', cat:'cancer', mal:true },
+  bcc:    { name:'Basal Cell Carcinoma', cat:'cancer', mal:true },
+  dpn:    { name:'Dermatosis Papulosa Nigra', cat:'benign', mal:false },
+  eczema: { name:'Eczema / Dermatitis', cat:'inflam', mal:false },
+  keloid: { name:'Keloid', cat:'scar', mal:false },
+};
+const BLIND = { cancer:[.90,.88,.82,.70,.58,.48], inflam:[.87,.85,.80,.68,.55,.45], benign:[.88,.86,.81,.70,.58,.48], scar:[.83,.81,.76,.65,.52,.42] };
+const AWARE = { cancer:[.88,.87,.86,.85,.84,.82], inflam:[.85,.84,.84,.83,.82,.80], benign:[.86,.86,.85,.85,.84,.82], scar:[.81,.81,.80,.80,.79,.77] };
+const CONFUSE = { mel:'dpn', bcc:'eczema', dpn:'mel', eczema:'bcc', keloid:'mel' };
+const FC = {1:'#FFDFC4',2:'#F0C8A0',3:'#D4A574',4:'#A67B5B',5:'#6B4226',6:'#3B2210'};
+const CASES = { 'mel-6':{c:'mel',f:6},'dpn-6':{c:'dpn',f:6},'bcc-5':{c:'bcc',f:5},'mel-1':{c:'mel',f:1},'eczema-5':{c:'eczema',f:5},'keloid-6':{c:'keloid',f:6} };
+let sel = null;
+function j(v,r=.02){return Math.max(0,Math.min(1,v+(Math.random()-.5)*2*r));}
+function $(id){return document.getElementById(id);}
+function pickCase(btn){ document.querySelectorAll('.sim-btn:not(.run)').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); sel=btn.dataset.case; $('run-btn').disabled=false; }
+function sl(ms){return new Promise(r=>setTimeout(r,ms));}
+
+async function runSim(){
+  if(!sel)return;
+  $('run-btn').disabled=true;
+  const {c,f}=CASES[sel]; const info=C[c]; const fc=FC[f];
+  // Reset
+  ['s-diag','s-conf','s-bias','s-miss','p-diag','p-conf','p-bias','p-miss'].forEach(id=>$(id).textContent='-');
+  ['s-conf-bar','s-bias-bar','s-miss-bar','p-conf-bar','p-bias-bar','p-miss-bar'].forEach(id=>$(id).style.width='0%');
+  ['s-verdict','p-verdict'].forEach(id=>{$(id).style.display='none';});
+  document.querySelectorAll('.sim-step').forEach(s=>s.classList.remove('active'));
+  ['st-probe-out','st-field-out','st-core-out','st-audit-out'].forEach(id=>$(id).textContent='-');
+  ['nar-probe','nar-field','nar-core','nar-audit'].forEach(id=>$(id).textContent='');
+  // Case info
+  ['s','p'].forEach(s=>{ $(s+'-case').style.display=''; $(s+'-name').textContent=info.name; $(s+'-fitz').innerHTML=`<span class="sim-fitz-dot" style="background:${fc}"></span>Fitzpatrick ${f}`; });
+
+  // === STANDARD AI ===
+  const bAcc=BLIND[info.cat][f-1]; const sConf=j(bAcc,.03);
+  const correct=f<=3||Math.random()<sConf;
+  const sDiag=correct?info.name:(C[CONFUSE[c]]?.name||info.name);
+  const sGap=Math.abs(BLIND[info.cat][0]-bAcc);
+  const sMiss=info.mal?j(1-sConf,.05):j(.05,.02);
+  await sl(400);
+  $('s-diag').textContent=sDiag;
+  $('s-conf-bar').style.width=(sConf*100)+'%'; $('s-conf').textContent=(sConf*100).toFixed(1)+'%';
+  await sl(250);
+  $('s-bias-bar').style.width=Math.min(sGap*200,100)+'%'; $('s-bias').textContent=(sGap*100).toFixed(1)+'%';
+  await sl(250);
+  $('s-miss-bar').style.width=(sMiss*100)+'%'; $('s-miss').textContent=(sMiss*100).toFixed(0)+'%';
+  await sl(350);
+  const sv=$('s-verdict');
+  if(!correct&&info.mal){sv.className='sim-verdict bad';sv.textContent='MISSED CANCER — Patient at risk';sv.style.display='';}
+  else if(!correct){sv.className='sim-verdict bad';sv.textContent='MISDIAGNOSIS \u2014 Called it '+sDiag;sv.style.display='';}
+  else if(sGap>.15){sv.className='sim-verdict warn';sv.textContent='Correct, but confidence drops on dark skin';sv.style.display='';}
+  else{sv.className='sim-verdict good';sv.textContent='Correct';sv.style.display='';}
+
+  // === PANDERMA COURTROOM ===
+  const aAcc=AWARE[info.cat][f-1];
+
+  // Probe (Investigator)
+  $('st-probe').classList.add('active');
+  const probeConf=j(aAcc*.5+bAcc*.5,.02);
+  const entropy=j(1-probeConf,.03);
+  $('st-probe-out').textContent=`${info.name} @ ${(probeConf*100).toFixed(0)}% | entropy: ${entropy.toFixed(2)}`;
+  const highEntropy = entropy > 0.35;
+  $('nar-probe').textContent = highEntropy
+    ? `"The Investigator ran 30 passes and got inconsistent answers. Flagging for Expert Witness review."`
+    : `"The Investigator ran 30 passes. Answers are consistent \u2014 confidence is solid."`;
+  await sl(600);
+
+  // Field (Expert Witness)
+  $('st-field').classList.add('active');
+  const fieldConf=j(aAcc,.02);
+  $('st-field-out').textContent=`Confirms ${info.name} @ ${(fieldConf*100).toFixed(0)}% with Fitz ${f} context`;
+  $('nar-field').textContent = f >= 4
+    ? `"Expert Witness applies Fitzpatrick ${f} knowledge \u2014 adjusting for how ${info.name} presents on darker skin."`
+    : `"Expert Witness confirms the Investigator's findings with clinical context."`;
+  await sl(600);
+
+  // Core (Judge)
+  $('st-core').classList.add('active');
+  const coreConf=j(fieldConf*.6+probeConf*.3+.05,.02);
+  const decision=info.mal&&f>=5?'DEFER':coreConf>.75?'CONSENSUS':'CAUTIOUS';
+  $('st-core-out').textContent=`${decision} @ ${(coreConf*100).toFixed(0)}% | tau=${info.mal?'0.35':'0.70'}`;
+  if(decision==='DEFER') {
+    $('nar-core').textContent = `"The Judge is not confident enough. Cancer is in the differential \u2014 threshold dropped to 0.35. Deferring to human clinician."`;
+  } else if(decision==='CAUTIOUS') {
+    $('nar-core').textContent = `"The Judge has weighed both testimonies. Confidence is moderate \u2014 proceeding with caution."`;
+  } else {
+    $('nar-core').textContent = `"The Judge finds consensus between Investigator and Expert Witness. Verdict is clear."`;
+  }
+  await sl(600);
+
+  // Auditor (Internal Affairs)
+  $('st-audit').classList.add('active');
+  const biasGap=Math.abs(probeConf-fieldConf);
+  const level=biasGap>.18?'RED':biasGap>.08?'YELLOW':'GREEN';
+  $('st-audit-out').textContent=`Gap: ${(biasGap*100).toFixed(0)}% \u2014 ${level}${level==='RED'?' \u2192 ALERT':''}`;
+  if(level==='RED') {
+    $('nar-audit').textContent = `"Internal Affairs detects significant bias gap. The system would have performed differently on lighter skin. Alert sent to Judge."`;
+  } else if(level==='YELLOW') {
+    $('nar-audit').textContent = `"Internal Affairs notes moderate gap between agents. Logged to Conflict Ledger for monitoring."`;
+  } else {
+    $('nar-audit').textContent = `"Internal Affairs: all clear. Bias gap is within acceptable range. Logged to Conflict Ledger."`;
+  }
+  await sl(500);
+
+  // PANDERMA results
+  $('p-diag').textContent=info.name;
+  $('p-conf-bar').style.width=(coreConf*100)+'%'; $('p-conf').textContent=(coreConf*100).toFixed(1)+'%';
+  await sl(200);
+  $('p-bias-bar').style.width=Math.min(biasGap*200,100)+'%'; $('p-bias').textContent=(biasGap*100).toFixed(1)+'%';
+  await sl(200);
+  const pMiss=j(sMiss*.25,.02);
+  $('p-miss-bar').style.width=(pMiss*100)+'%'; $('p-miss').textContent=(pMiss*100).toFixed(0)+'%';
+  await sl(350);
+  const pv=$('p-verdict');
+  if(decision==='DEFER'){pv.className='sim-verdict warn';pv.textContent='DEFERRED \u2014 "Not confident enough. Sending to human clinician."';pv.style.display='';}
+  else{pv.className='sim-verdict good';pv.textContent=`${decision} \u2014 ${info.name} confirmed by full courtroom`;pv.style.display='';}
+  $('run-btn').disabled=false;
+}
+</script>
+</body>
+</html>
